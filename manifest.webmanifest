@@ -1,0 +1,16 @@
+{
+  "name": "靖雅的福岡任務簿",
+  "short_name": "福岡任務",
+  "description": "群益期貨 福岡 5 日 11/4 – 11/8 活動總召備忘",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F1E8",
+  "theme_color": "#F7F1E8",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
