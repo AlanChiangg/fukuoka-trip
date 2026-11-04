@@ -176,6 +176,8 @@
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .pill.wanted{border-color:var(--blade);color:var(--blade)}
   .pill.found{border-color:var(--gold);background:var(--gold-soft);color:var(--gold-ink);font-weight:600}
+  .pill.undo{color:var(--muted);border-style:dashed}
+  .today .nx .acts .undo{grid-column:1/-1}
   .got{font-size:9.5px;letter-spacing:.08em;padding:2px 6px;border-radius:3px;font-weight:700;line-height:1.2;background:var(--gold);color:#fff}
   .it .c{min-width:0}
   .it .t{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--pump);font-weight:600;margin-bottom:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -566,7 +568,7 @@ function pillCopy(text,label,big){ return '<button class="pill cp'+(big?' big':'
 
 function thumbsHTML(){
   return '<div class="thumbs">'+
-    '<button class="thumb" data-wanted aria-label="看盒玩款大圖"><img src="sword-box.webp" alt="ウェポンコレクション 盒玩與大師之劍" loading="lazy"></button>'+
+    '<button class="thumb" data-wanted aria-label="看盒玩款大圖"><img src="sword-weapon.webp" alt="ウェポンコレクション 盒玩與大師之劍" loading="lazy"></button>'+
     '<button class="thumb" data-wanted aria-label="看絨毛台座款大圖"><img src="sword-plush.webp" alt="大師之劍絨毛台座款" loading="lazy"></button>'+
     '</div>';
 }
@@ -577,7 +579,8 @@ function itemActs(it,big){
     const c=big?' big':'';
     return '<a class="pill go'+c+'" target="_blank" rel="noopener" href="'+mapURL('ローソン')+'">'+PIN+'找最近的 LAWSON</a>'+
            '<button class="pill wanted'+c+'" data-wanted>🗡️ 尋劍啟事</button>'+
-           '<button class="pill found'+c+'" data-found>🎉 找到了！</button>';
+           '<button class="pill found'+c+'" data-found>🎉 找到了！</button>'+
+           (FOUND?'<button class="pill undo'+c+'" data-lost>↩ 按錯了，減一把</button>':'');
   }
   const dest=it.nav===false?null:(it.to||it.q);
   if(dest) a+=pillGo(dest,it.mode,it.tl?'導航到 '+it.tl:'導航',big);
@@ -889,7 +892,7 @@ function wantedHTML(){
   return '<div class="wp"><div class="w-top">WANTED・尋劍啟事</div>'+
     '<div class="w-h">男友大大遺失的大師之劍</div>'+
     '<div class="w-sub">最後目擊地點：LAWSON 零食區。懸賞：男友大大崇拜的眼神 ×1。</div>'+
-    '<div class="w-card"><img src="sword-box.webp" alt="ウェポンコレクション 盒玩與大師之劍"><div class="w-txt">'+
+    '<div class="w-card"><img src="sword-weapon.webp" alt="ウェポンコレクション 盒玩與大師之劍"><div class="w-txt">'+
       '<b>ゼルダの伝説 ウェポンコレクション</b>'+
       '<em class="yes">✓ LAWSON 11/3 起陸續開賣・¥495（含稅）</em>'+
       '<p>不是每間同時上架，這間沒有就換下一間。全 9 種隨機、盒外看不出來，目標是「マスターソード」或稀有款「マスターソード（納刀Ver.）」。抽到別的也別難過，林克什麼武器都能用。</p>'+
@@ -992,7 +995,7 @@ document.addEventListener('click',e=>{
     FOUND=Math.max(0,FOUND+(fnd?1:-1)); store(K.sword,FOUND);
     keepScroll(render);
     if(sheetOpen()) document.getElementById('sheetBody').innerHTML=wantedHTML();
-    if(fnd) toast('噠噠噠噠～！獲得大師之劍！');
+    toast(fnd?'噠噠噠噠～！獲得大師之劍！':'好，收回一把');
     return;
   }
   if(e.target.closest('[data-wanted]')){ openSheet(wantedHTML()); return }
