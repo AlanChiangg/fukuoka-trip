@@ -33,6 +33,7 @@
     --gold:#D9A441;
     --gold-ink:#8F6412;
     --gold-soft:rgba(217,164,65,.14);
+    --blade:#3A5CBE;
     --ink-soft:rgba(42,31,51,.05);
     --ok:#4F7D3A;
     --warn:#B8342A;
@@ -167,6 +168,15 @@
   .it .ic.stay{background:var(--gold-soft);border-color:rgba(217,164,65,.3)}
   .it .ic.move{background:var(--ink-soft);border-color:var(--rule)}
   .it .ic.task{background:var(--card);border-color:var(--rule)}
+  .it.quest{background:linear-gradient(135deg, rgba(58,92,190,.1), rgba(217,164,65,.14))}
+  .it.quest .t{color:var(--blade)}
+  .it .ic.quest{background:#EEF2FF;border-color:rgba(58,92,190,.3)}
+  .thumbs{display:flex;gap:8px;margin-top:9px}
+  .thumb{appearance:none;padding:0;border:1.5px solid var(--gold);border-radius:8px;overflow:hidden;width:72px;height:72px;background:var(--card);cursor:pointer;touch-action:manipulation;flex:none}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .pill.wanted{border-color:var(--blade);color:var(--blade)}
+  .pill.found{border-color:var(--gold);background:var(--gold-soft);color:var(--gold-ink);font-weight:600}
+  .got{font-size:9.5px;letter-spacing:.08em;padding:2px 6px;border-radius:3px;font-weight:700;line-height:1.2;background:var(--gold);color:#fff}
   .it .c{min-width:0}
   .it .t{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--pump);font-weight:600;margin-bottom:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
   .it .t.none{display:none}
@@ -281,6 +291,24 @@
   .drv .addr{font-family:var(--jp);font-size:19px;line-height:1.55;margin-top:12px}
   .drv .ask{font-family:var(--jp);font-size:24px;font-weight:700;margin-top:18px;padding-top:14px;border-top:2px solid var(--pump);color:var(--pump)}
   .drv .zh{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .wp .w-top{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--blade);font-weight:700}
+  .wp .w-h{font-size:24px;font-weight:800;line-height:1.25;margin-top:6px}
+  .wp .w-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.55}
+  .wp .w-card{border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-top:12px;background:var(--card)}
+  .wp .w-card img{width:100%;display:block}
+  .wp .w-txt{padding:10px 12px 12px}
+  .wp .w-txt b{display:block;font-family:var(--jp);font-size:15px}
+  .wp .w-txt em{display:block;font-style:normal;font-size:12px;font-weight:600;margin-top:3px}
+  .wp .w-txt em.yes{color:var(--ok)}
+  .wp .w-txt em.maybe{color:var(--gold-ink)}
+  .wp .w-txt p{font-size:12.5px;color:var(--muted);line-height:1.6;margin:5px 0 0}
+  .wp .w-ask{margin-top:12px;padding:12px;border-radius:10px;background:var(--grape-soft)}
+  .wp .w-ask .jp{font-family:var(--jp);font-size:18px;font-weight:700;line-height:1.5;margin-top:5px}
+  .wp .w-ask .zh{font-size:12px;color:var(--muted);margin-top:4px}
+  .wp .w-warn{font-size:12.5px;line-height:1.6;color:var(--muted);margin-top:12px}
+  .wp .w-warn b{color:var(--warn)}
+  .wp .w-got{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13.5px}
+  .wp .w-got b{font-size:20px;color:var(--gold-ink)}
 
   .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;
     background:var(--ink);color:var(--paper);font-size:13px;padding:10px 16px;border-radius:999px;z-index:60;transition:.2s;pointer-events:none;white-space:nowrap}
@@ -373,6 +401,9 @@ const ALWAYS = [
   {nm:'蒐集雜支收據', who:ME, ic:'🧾', sb:'每筆花費都拿收據，馬上記進 INFO 的「雜支收據」'},
 ];
 
+/* 支線任務：男友大大的大師之劍。t 不含時間，不影響「現在／下一站」的時間判斷 */
+const QUEST=(n,when,sb)=>({quest:1, t:'🗡️ 支線任務 '+n+'/5・'+when, ic:'🗡️', k:'quest', nm:'去 LAWSON 看看有沒有男友大大遺失的大師之劍', sb});
+
 const TRIP = [
   {
     date:'2026-11-04', d:'11/4', w:'三', title:'出發・福岡・天神屋台', stay:[['hakata',1080]],
@@ -386,6 +417,7 @@ const TRIP = [
       {t:'18:00 後', ic:'💴', k:'food', nm:'晚餐自理・發放代金 ¥2,000／人', sb:'<b>留意</b>：代金是旅行社發的，確認每個人都拿到', q:'福岡空港', nav:false},
       {t:'', ic:'🏨', k:'stay', nm:'CROSS Life 博多柳橋', sb:'辦理入住', q:HOTELS.hakata.q, stay:'hakata', mode:'transit', tl:'飯店'},
       {t:'晚上', ic:'🏮', k:'spot', nm:'自由夜訪天神中洲屋台', sb:'自由活動・提醒同仁結伴、記飯店名', q:'中洲屋台', mode:'walking'},
+      QUEST(1,'回飯店路上','Hey! Listen! 傳說博多的 LAWSON 沉睡著一把大師之劍。第一天先探探路，勇者靖雅。'),
     ]
   },
   {
@@ -401,6 +433,7 @@ const TRIP = [
       {t:'', ic:'🌋', k:'spot', nm:'別府海地獄', sb:'買驚喜點心（溫泉饅頭）', q:'海地獄 別府'},
       {t:'', ic:'🏨', k:'stay', nm:'別府龜之井飯店', sb:'辦理入住・溫泉', q:HOTELS.beppu.q, stay:'beppu', mode:'transit', tl:'飯店'},
       {t:'晚', ic:'🍱', k:'food', nm:'飯店內晚餐'},
+      QUEST(2,'飯後散步','海地獄高達 98°C，大師之劍應該不在裡面，請改查飯店附近的 LAWSON（晚上出門跟領隊說一聲）。'),
     ]
   },
   {
@@ -415,6 +448,7 @@ const TRIP = [
       {t:'', ic:'🚠', k:'spot', nm:'別府空中纜車', sb:'鶴見岳・九州最大車廂', q:'別府ロープウェイ'},
       {t:'', ic:'🚂', k:'move', nm:'由布院之森列車', sb:'車上吃日式便當・<b>留意</b>：若停駛改搭專車，每人退 ¥3,000（兒童 ¥1,500）', q:'由布院駅'},
       {t:'', ic:'🌉', k:'spot', nm:'九重夢大吊橋', sb:'遇雨不能撐傘，提醒同仁帶輕便雨衣', q:'九重夢大吊橋'},
+      QUEST(3,'車上休息時','今天總召最大，頒獎晚宴第一！休息時剛好看到 LAWSON 再衝，沒看到也沒關係，這把劍等了一百年，不差這一天。'),
       {t:'', ic:'🏨', k:'stay', nm:'阿蘇廣場酒店', sb:'辦理入住・今晚晚宴會場', q:HOTELS.aso.q, stay:'aso', mode:'transit', tl:'飯店'},
       {t:'晚', ic:'🏆', k:'food', nm:'頒獎晚宴・飯店內晚餐', sb:'手拿板 32、骰子 2、流程表、得獎名單、禮品 10 份'},
     ]
@@ -433,6 +467,7 @@ const TRIP = [
       {t:'', ic:'🛶', k:'spot', nm:'柳川人力遊船', q:'柳川川下り'},
       {t:'', ic:'🏨', k:'stay', nm:'福岡王子飯店百道濱', sb:'辦理入住', q:HOTELS.momochi.q, stay:'momochi', mode:'transit', tl:'飯店'},
       {t:'晚', ic:'💴', k:'food', nm:'天神自由逛街・晚餐自理・發放代金 ¥2,000／人', sb:'<b>留意</b>：確認每個人都拿到代金，約好集合時間地點', q:'天神 福岡', mode:'walking'},
+      QUEST(4,'天神逛街時','今日最佳狩獵日！天神是大城市，這間沒有就換下一間。男友大大正在台灣望眼欲穿。'),
     ]
   },
   {
@@ -448,6 +483,7 @@ const TRIP = [
       {t:'', ic:'⛩️', k:'spot', nm:'太宰府天滿宮', sb:'買梅枝餅', q:'太宰府天満宮'},
       {t:'午', ic:'🍲', k:'food', nm:'水炊風味御膳'},
       {t:'', ic:'🛍️', k:'spot', nm:'LaLaport 福岡', sb:'1:1 鋼彈・約好集合', q:'ららぽーと福岡'},
+      QUEST(5,'LaLaport 自由時間','最終關卡！附近有 LAWSON 就再巡一間。找不到也沒關係，勇者平安回家最重要（男友大大含淚表示）。'),
       {t:'', ic:'🛫', k:'move', nm:'福岡機場', sb:'收票根、清點人數', q:'福岡空港 国際線', mode:'transit', tl:'福岡機場'},
       {t:'19:10 – 20:50', ic:'✈️', k:'move', nm:'星宇 JX841 福岡 → 桃園', sb:'機上簡餐・抵達是台灣時間・回家！'},
     ]
@@ -455,10 +491,10 @@ const TRIP = [
 ];
 
 /* ================= 工具 ================= */
-const K={done:'fuk2026-done', cnt:'fuk2026-cnt', rcpt:'fuk2026-rcpt', gift:'fuk2026-gift', rate:'fuk2026-rate'};
+const K={done:'fuk2026-done', cnt:'fuk2026-cnt', rcpt:'fuk2026-rcpt', gift:'fuk2026-gift', rate:'fuk2026-rate', sword:'fuk2026-sword'};
 const load=(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)||'null')||d }catch(e){ return d } };
 const store=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} };
-let DONE=load(K.done,{}), CNT=load(K.cnt,{}), RCPT=load(K.rcpt,[]), GIFT=load(K.gift,[]);
+let DONE=load(K.done,{}), CNT=load(K.cnt,{}), RCPT=load(K.rcpt,[]), GIFT=load(K.gift,[]), FOUND=load(K.sword,0);
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* sb 欄位允許 <b> 標示「留意」，其餘跳脫 */
@@ -528,8 +564,21 @@ function pillTel(tel,big,label){ return '<a class="pill tel'+(big?' big':'')+'" 
 function pillDrv(key,big){ return '<button class="pill drv'+(big?' big':'')+'" data-drv="'+key+'">🚕 給司機看</button>' }
 function pillCopy(text,label,big){ return '<button class="pill cp'+(big?' big':'')+'" data-copy="'+esc(text)+'">'+COPY+esc(label||'複製')+'</button>' }
 
+function thumbsHTML(){
+  return '<div class="thumbs">'+
+    '<button class="thumb" data-wanted aria-label="看盒玩款大圖"><img src="sword-box.webp" alt="ウェポンコレクション 盒玩與大師之劍" loading="lazy"></button>'+
+    '<button class="thumb" data-wanted aria-label="看絨毛台座款大圖"><img src="sword-plush.webp" alt="大師之劍絨毛台座款" loading="lazy"></button>'+
+    '</div>';
+}
+const itemSb=it=>it.quest&&FOUND?'噠噠噠噠～已入手 '+FOUND+' 把！男友大大感動落淚。要不要再抽幾盒，勇者自行決定。':it.sb;
 function itemActs(it,big){
   let a='';
+  if(it.quest){
+    const c=big?' big':'';
+    return '<a class="pill go'+c+'" target="_blank" rel="noopener" href="'+mapURL('ローソン')+'">'+PIN+'找最近的 LAWSON</a>'+
+           '<button class="pill wanted'+c+'" data-wanted>🗡️ 尋劍啟事</button>'+
+           '<button class="pill found'+c+'" data-found>🎉 找到了！</button>';
+  }
   const dest=it.nav===false?null:(it.to||it.q);
   if(dest) a+=pillGo(dest,it.mode,it.tl?'導航到 '+it.tl:'導航',big);
   if(it.q) a+=pillMap(it.q,it.ql,big);
@@ -615,7 +664,8 @@ function renderToday(i,now,pr){
     h+='<div class="nx"><div class="k">下一站 NEXT</div>'+
        (n.t?'<div class="t">'+esc(n.t)+'</div>':'')+
        '<div class="nm">'+esc(n.nm)+'</div>'+
-       (n.sb?'<div class="sb">'+sbHTML(n.sb)+'</div>':'')+
+       (itemSb(n)?'<div class="sb">'+sbHTML(itemSb(n))+'</div>':'')+
+       (n.quest?thumbsHTML():'')+
        '<div class="acts">'+itemActs(n,true)+'</div></div>';
   }else{
     h+='<div class="done">'+(pr.all?'今天行程都跑完了，好好休息 🎃':'今天沒有下一站了，好好休息！')+'</div>';
@@ -642,13 +692,14 @@ function renderDay(i){
     const st=j===pr.cur?'now':j===pr.next?'next':'';
     const tag=st==='now'?'<span class="tag now">NOW</span>':st==='next'?'<span class="tag next">NEXT</span>':'';
     const acts=itemActs(it,false);
-    h+='<div class="it'+(st==='now'?' now':'')+'" data-on="'+on+'" data-id="'+id+'">'+
+    h+='<div class="it'+(st==='now'?' now':'')+(it.quest?' quest':'')+'" data-on="'+on+'" data-id="'+id+'">'+
        '<div class="box" role="checkbox" aria-checked="'+(on==='1')+'" tabindex="0" aria-label="標記完成">'+CHECK+'</div>'+
        '<div class="ic '+it.k+'">'+it.ic+'</div>'+
        '<div class="c">'+
-         '<div class="t'+(it.t||tag?'':' none')+'">'+(it.t?esc(it.t):'')+tag+'</div>'+
+         '<div class="t'+(it.t||tag?'':' none')+'">'+(it.t?esc(it.t):'')+tag+(it.quest&&FOUND?'<span class="got">已入手 '+FOUND+' 把</span>':'')+'</div>'+
          '<div class="nm">'+esc(it.nm)+'</div>'+
-         (it.sb?'<div class="sb">'+sbHTML(it.sb)+'</div>':'')+
+         (itemSb(it)?'<div class="sb">'+sbHTML(itemSb(it))+'</div>':'')+
+         (it.quest?thumbsHTML():'')+
          (acts?'<div class="acts">'+acts+'</div>':'')+
        '</div></div>';
   });
@@ -834,6 +885,29 @@ function driverHTML(key){
          '<div class="ask">ここまでお願いします。</div><div class="zh">（請載我到這裡）</div>'+
          '<div class="acts" style="margin-top:16px">'+pillTel(H.tel)+pillGo(H.q,'transit','導航')+'</div></div>';
 }
+function wantedHTML(){
+  return '<div class="wp"><div class="w-top">WANTED・尋劍啟事</div>'+
+    '<div class="w-h">男友大大遺失的大師之劍</div>'+
+    '<div class="w-sub">最後目擊地點：LAWSON 零食區。懸賞：男友大大崇拜的眼神 ×1。</div>'+
+    '<div class="w-card"><img src="sword-box.webp" alt="ウェポンコレクション 盒玩與大師之劍"><div class="w-txt">'+
+      '<b>ゼルダの伝説 ウェポンコレクション</b>'+
+      '<em class="yes">✓ LAWSON 11/3 起陸續開賣・¥495（含稅）</em>'+
+      '<p>不是每間同時上架，這間沒有就換下一間。全 9 種隨機、盒外看不出來，目標是「マスターソード」或稀有款「マスターソード（納刀Ver.）」。抽到別的也別難過，林克什麼武器都能用。</p>'+
+    '</div></div>'+
+    '<div class="w-card"><img src="sword-plush.webp" alt="大師之劍絨毛台座款"><div class="w-txt">'+
+      '<b>絨毛台座款</b>'+
+      '<em class="maybe">？不確定 LAWSON 有沒有賣</em>'+
+      '<p>劍可以從絨毛台座拔出來。看到就拍照傳給男友大大。</p>'+
+    '</div></div>'+
+    '<div class="w-ask"><div class="lbl">問店員就說</div>'+
+      '<div class="jp">すみません、ゼルダの伝説のウェポンコレクションは置いてありますか？</div>'+
+      '<div class="zh">（不好意思，請問有賣薩爾達傳說的武器收藏盒玩嗎？）</div></div>'+
+    '<div class="w-warn">⚠️ 這筆<b>不能報公帳</b>，別記進雜支收據。公司任務優先，沒空就跳過。</div>'+
+    '<div class="w-got"><span>目前入手 <b>'+FOUND+'</b> 把</span>'+
+      (FOUND?'<button class="pill" data-lost>按錯了，減一把</button>':'')+
+      '<button class="pill found" data-found>🎉 找到了！</button></div>'+
+    '</div>';
+}
 const HAS_HISTORY=typeof history!=='undefined' && !!history.pushState;
 function openSheet(html){
   const s=document.getElementById('sheet'), card=s.querySelector('.sheet-card');
@@ -898,7 +972,7 @@ function go(i){
     if(window.scrollY>top) window.scrollTo(0,top);
   }
 }
-function resetAll(){ if(confirm('要清除所有勾選與計數嗎？（收據與禮物紀錄會保留）')){ DONE={}; CNT={}; store(K.done,DONE); store(K.cnt,CNT); render() } }
+function resetAll(){ if(confirm('要清除所有勾選與計數嗎？（收據與禮物紀錄會保留）')){ DONE={}; CNT={}; FOUND=0; store(K.done,DONE); store(K.cnt,CNT); store(K.sword,0); render() } }
 function keepScroll(fn){ const y=window.scrollY; fn(); window.scrollTo(0,y) }
 
 document.addEventListener('click',e=>{
@@ -913,6 +987,15 @@ document.addEventListener('click',e=>{
     const id=(inc||dec).closest('[data-ctr]').dataset.ctr;
     CNT[id]=Math.max(0,(CNT[id]||0)+(inc?1:-1)); store(K.cnt,CNT); keepScroll(render); return;
   }
+  const fnd=e.target.closest('[data-found]'), lost=e.target.closest('[data-lost]');
+  if(fnd||lost){
+    FOUND=Math.max(0,FOUND+(fnd?1:-1)); store(K.sword,FOUND);
+    keepScroll(render);
+    if(sheetOpen()) document.getElementById('sheetBody').innerHTML=wantedHTML();
+    if(fnd) toast('噠噠噠噠～！獲得大師之劍！');
+    return;
+  }
+  if(e.target.closest('[data-wanted]')){ openSheet(wantedHTML()); return }
   if(e.target.closest('[data-addrcpt]')){ addReceipt(); return }
   const del=e.target.closest('[data-delrcpt]');
   if(del){ RCPT.splice(+del.dataset.delrcpt,1); store(K.rcpt,RCPT); keepScroll(render); return }
