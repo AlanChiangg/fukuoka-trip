@@ -1,7 +1,7 @@
 /* 離線快取：頁面先試網路（3 秒內沒回應就用快取），圖示等靜態檔直接用快取。
    改了 index.html 要把 VERSION 加 1，手機才會換新。 */
-const VERSION = 'fukuoka-v4';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './sword-weapon.webp', './sword-plush.webp'];
+const VERSION = 'fukuoka-v5';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './a2hs.js', './sword-weapon.webp', './sword-plush.webp'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
